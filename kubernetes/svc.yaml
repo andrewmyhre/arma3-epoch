@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: epoch
+  namespace: arma3epoch
+spec:
+  ports:
+  - name: "2302"
+    port: 2302
+    protocol: UDP
+    targetPort: 2302
+    nodePort: 32302
+  - name: "2303"
+    port: 2303
+    protocol: UDP
+    targetPort: 2303
+    nodePort: 32303
+  - name: "2304"
+    port: 2304
+    protocol: UDP
+    targetPort: 2304
+    nodePort: 32304
+  - name: "2305"
+    port: 2305
+    protocol: UDP
+    targetPort: 2305
+    nodePort: 32305
+  - name: "2306"
+    port: 2306
+    protocol: UDP
+    targetPort: 2306
+    nodePort: 32306
+  selector:
+    app: epoch
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

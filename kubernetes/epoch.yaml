@@ -1,0 +1,90 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: arma3-pv-claim
+spec:
+  storageClassName: gp2-us-east-1a
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: epoch-pv-claim
+spec:
+  storageClassName: gp2-us-east-1a
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: epoch
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: epoch
+    spec:
+      containers:
+      - name: epoch
+        image: andrewmyhre/arma3-epoch:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "2"
+          requests:
+            cpu: "1"
+            memory: "6Gi"
+        ports:
+        - containerPort: 2302
+          protocol: UDP
+        - containerPort: 2303
+          protocol: UDP
+        - containerPort: 2304
+          protocol: UDP
+        - containerPort: 2305
+          protocol: UDP
+        - containerPort: 2306
+          protocol: UDP
+        env:
+          - name: STEAM_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: arma3-secrets
+                key: STEAM_USERNAME
+          - name: STEAM_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: arma3-secrets
+                key: STEAM_PASSWORD
+        volumeMounts:
+          - mountPath: "/arma3"
+            name: arma3-pv-storage
+          - mountPath: "/data"
+            name: epoch-pv-storage
+          - mountPath: "/arma3/@epochhive"
+            name: epochhive-configmap
+          - mountPath: "/arma3/sc"
+            name: sc-configmap
+      volumes:
+        - name: epoch-pv-storage
+          persistentVolumeClaim:
+           claimName: epoch-pv-claim
+        - name: arma3-pv-storage
+          persistentVolumeClaim:
+           claimName: arma3-pv-claim
+        - name: epochhive-configmap
+          configMap:
+            name: epochhive-configmap
+        - name: sc-configmap
+          configMap:
+            name: sc-configmap

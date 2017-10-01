@@ -1,0 +1,31 @@
+version: '3'
+services:
+  epoch:
+    networks:
+      epoch-network:
+        aliases:
+          - epoch
+    build: .
+    image: andrewmyhre/arma3-epoch:latest
+    ports:
+     - "2302:2302/udp"
+     - "2303:2303/udp"
+     - "2304:2304/udp"
+     - "2305:2305/udp"
+     - "2306:2306/udp"
+    env_file: steamcredentials
+    volumes:
+      - ./arma3/@epochhive/epochconfig.hpp:/arma3/@epochhive/epochconfig.hpp
+      - ./arma3/@epochhive/epochserver.ini:/arma3/@epochhive/epochserver.ini
+      - ./arma3/sc/basic.cfg:/arma3/sc/basic.cfg
+      - ./arma3/sc/server.cfg:/arma3/sc/server.cfg
+  redis:
+    image: "redis:alpine"
+    networks:
+      epoch-network:
+        aliases:
+          - redis
+    ports:
+     - "6379:6379"
+networks:
+  epoch-network:
